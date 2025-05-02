@@ -36,14 +36,14 @@ def visualizar_com_matplotlib(matriz, caminho_imagem, output_dir='output'):
             matriz_heatmap[y, x] = 1
         plt.imshow(matriz_heatmap, cmap='hot', alpha=0.9, interpolation='none')
 
-    fator_correcao = 0.35
-    pixel_size = (72. / dpi) * fator_correcao
-    plt.scatter(xs, ys,
-                color='cyan',
-                s=pixel_size,
-                alpha=0.6,
-                edgecolors='none',
-                label=f'Pontos (n={len(xs)})')
+    # fator_correcao = 0.35
+    # pixel_size = (72. / dpi) * fator_correcao
+    # plt.scatter(xs, ys,
+    #             color='cyan',
+    #             s=pixel_size,
+    #             alpha=0.6,
+    #             edgecolors='none',
+    #             label=f'Pontos (n={len(xs)})')
 
     plt.colorbar(heatmap, label='Intensidade do Gaze')
     plt.title(f"Mapa de Calor Preciso - {os.path.basename(caminho_imagem)}")
