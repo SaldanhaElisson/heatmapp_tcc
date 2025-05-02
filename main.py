@@ -147,10 +147,8 @@ if __name__ == "__main__":
         print(f"\nProcessando {caminho_imagem}...")
         print(f"Total de pontos: {len(pontos)}")
 
-        # Cria matriz de gaze
         matriz = criar_matriz_gaze(caminho_imagem, pontos)
 
-        # Estatísticas
         print(f"Pontos marcados na matriz: {np.sum(matriz)}")
         print(f"Porcentagem de cobertura: {np.sum(matriz) / len(pontos) * 100:.2f}%")
 
