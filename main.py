@@ -20,7 +20,7 @@ def visualizar_com_matplotlib(matriz, caminho_imagem, output_dir='output'):
     plt.imshow(img, alpha=0.8)
     heatmap = plt.imshow(matriz_heatmap,
                          cmap='magma',
-                         alpha=0.9,
+                         alpha=0.7,
                          interpolation='none',
                          vmin=0,
                          vmax=1)
@@ -50,7 +50,7 @@ def visualizar_com_matplotlib(matriz, caminho_imagem, output_dir='output'):
     plt.legend()
 
     nome_base = os.path.splitext(os.path.basename(caminho_imagem))[0]
-    output_path = os.path.join(output_dir, f"{nome_base}_heatmap.png")
+    output_path = os.path.join(output_dir, f"{nome_base}_heatmap_2.png")
 
     plt.savefig(output_path, dpi=dpi, bbox_inches='tight', pad_inches=0.1)
     plt.show()
@@ -71,7 +71,6 @@ def criar_matriz_gaze(caminho_imagem, pontos_gaze):
                 y = int(round(float(ponto['y'])))
 
                 if 0 <= x < largura and 0 <= y < altura:
-                    print(f"Marcando ponto: ({y}, {x})")
                     matriz[y, x] = 1
                     pontos_validos += 1
 
