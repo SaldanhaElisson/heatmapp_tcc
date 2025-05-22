@@ -7,56 +7,73 @@ import os
 import shutil
 from pathlib import Path
 import glob
+from scipy.ndimage import gaussian_filter
 
+def visualizar_com_matplotlib(matriz, caminho_imagem, output_dir='output', smoothing_sigma=15):
+    """
+    Visualiza os pontos de gaze sobre a imagem e gera um heatmap.
 
-def visualizar_com_matplotlib(matriz, caminho_imagem, output_dir='output'):
-    os.makedirs(output_dir, exist_ok=True)
+    Args:
+        matriz (np.array): Matriz de contagem de gaze (pontos 1 onde houve gaze).
+        caminho_imagem (str): Caminho completo para a imagem de fundo.
+        output_dir (str): Diretório para salvar as imagens de saída.
+        smoothing_sigma (float): Desvio padrão para o filtro Gaussiano do heatmap.
+                                 Valores maiores = heatmap mais suave e espalhado.
+    """
+    Path(output_dir).mkdir(parents=True, exist_ok=True)
 
-    altura_matriz, largura_matriz = matriz.shape
+    img = Image.open(caminho_imagem).convert("RGBA")
+    
+    original_img_width, original_img_height = img.size
 
-    img = Image.open(caminho_imagem)
-    img = img.resize((largura_matriz, altura_matriz), Image.Resampling.LANCZOS)
+   
+    heatmap_data = gaussian_filter(matriz.astype(float), sigma=smoothing_sigma)
+    
+ 
+    if heatmap_data.max() > 0:
+        heatmap_data = heatmap_data / heatmap_data.max()
+    else:
+        heatmap_data = np.zeros_like(matriz, dtype=float)
 
     dpi = 100
-    fig = plt.figure(figsize=(14, 10), dpi=dpi)
+    fig, ax = plt.subplots(figsize=(original_img_width / dpi, original_img_height / dpi), dpi=dpi)
 
-    matriz_heatmap = np.copy(matriz)
-    matriz_heatmap[matriz_heatmap > 0] = 1
+  
+    ax.imshow(img, extent=[0, original_img_width, original_img_height, 0], alpha=1.0)
 
-    plt.imshow(img, alpha=0.8, extent=[0, largura_matriz, altura_matriz, 0])
-    heatmap = plt.imshow(matriz_heatmap,
-                         cmap='magma',
-                         alpha=0.9,
-                         interpolation='none',
-                         vmin=0,
-                         vmax=1,
-                         extent=[0, largura_matriz, altura_matriz, 0])
+  
+    heatmap = ax.imshow(heatmap_data,
+                         cmap='hot',
+                         alpha=0.7,
+                         interpolation='bilinear',
+                         extent=[0, original_img_width, original_img_height, 0],
+                         vmin=0, # Garante que a escala de cor comece do zero
+                         vmax=1) # Garante que a escala de cor vá até o máximo normalizado
 
-    pontos_heatmap = np.sum(matriz_heatmap)
-    ys, xs = np.where(matriz == 1)
-    pontos_scatter = len(xs)
+   
+    ys_scatter, xs_scatter = np.where(matriz == 1)
+    
+   
+    ax.scatter(xs_scatter, ys_scatter, c='blue', s=20, alpha=0.5, label='Pontos de Gaze')
 
-    if pontos_heatmap != pontos_scatter:
-        print(f"AVISO: Discrepância detectada - Heatmap:{pontos_heatmap} vs Scatter:{pontos_scatter}")
-        matriz_heatmap = np.zeros_like(matriz)
-        for y, x in zip(ys, xs):
-            matriz_heatmap[y, x] = 1
-        plt.imshow(matriz_heatmap,
-                   cmap='hot',
-                   alpha=0.9,
-                   interpolation='none',
-                   extent=[0, largura_matriz, altura_matriz, 0])
+    ax.set_ylim(original_img_height, 0)
+    ax.set_xlim(0, original_img_width)
 
-    plt.colorbar(heatmap, label='Intensidade do Gaze')
-    plt.title(f"Mapa de Calor Preciso - {os.path.basename(caminho_imagem)}")
-    plt.legend()
+    plt.colorbar(heatmap, ax=ax, label='Densidade do Gaze (Normalizada)')
+    
+    plt.title(f"Heatmap e Pontos de Gaze - {os.path.basename(caminho_imagem)}")
+    
+    ax.legend(loc='upper right')
+
+    ax.set_xticks([])
+    ax.set_yticks([])
 
     nome_base = os.path.splitext(os.path.basename(caminho_imagem))[0]
-    output_path = os.path.join(output_dir, f"{nome_base}_heatmap.png")
+    output_path = os.path.join(output_dir, f"{nome_base}_gaze_analysis.png")
 
     plt.savefig(output_path, dpi=dpi, bbox_inches='tight', pad_inches=0.1)
     plt.show()
-    plt.close()
+    plt.close(fig) # Fecha a figura para liberar memória
     print("Imagem salva com sucesso em:", output_path)
 
 
