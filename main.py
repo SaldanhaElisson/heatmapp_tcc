@@ -131,6 +131,8 @@ def sync_images(src_dir, dest_dir):
     src_path = Path(src_dir)
     dest_path = Path(dest_dir)
 
+    dest_path.mkdir(parents=True, exist_ok=True)
+
     for src_file in src_path.glob('**/*'):
         if src_file.is_file():
             relative_path = src_file.relative_to(src_path)
