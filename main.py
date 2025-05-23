@@ -72,8 +72,6 @@ def visualizar_com_matplotlib(matriz, caminho_imagem, output_dir='output', smoot
     plt.close(fig) 
     print("Imagem salva com sucesso em:", output_path)
 
-# --- FUNÇÃO criar_matriz_gaze (ALTERADA CRITICAMENTE) ---
-# Agora recebe pontos_gaze_brutos e informações do alvo na tela
 def criar_matriz_gaze(caminho_imagem, pontos_gaze_brutos, target_rect_info, width_img, height_img):
     print(f"\nDimensões da imagem para {Path(caminho_imagem).name}: {width_img}x{height_img} pixels")
     print(f"Dimensões do alvo na tela: X={target_rect_info['x']}, Y={target_rect_info['y']}, Width={target_rect_info['width']}, Height={target_rect_info['height']}")
