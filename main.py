@@ -9,7 +9,7 @@ from pathlib import Path
 import glob
 from scipy.ndimage import gaussian_filter
 
-def visualizar_com_matplotlib(matriz, caminho_imagem, output_dir='output', smoothing_sigma=15):
+def visualizar_com_matplotlib(matriz, caminho_imagem, output_dir='output', smoothing_sigma=30):
     """
     Visualiza os pontos de gaze sobre a imagem e gera um heatmap.
     """
@@ -95,12 +95,9 @@ def criar_matriz_gaze(caminho_imagem, pontos_gaze_brutos, target_rect_info, widt
             y_pixel = int(round(y_relative_pct / 100 * height_img))
 
             if 0 <= x_pixel < width_img and 0 <= y_pixel < height_img:
-                matriz[y_pixel, x_pixel] = 1 # Usa as coordenadas em pixel
+                matriz[y_pixel, x_pixel] = 1 
                 pontos_validos += 1
-            else:
-                
-                print(f"Ponto de gaze ({x_pixel},{y_pixel}) fora das dimensões da imagem ({width_img}x{height_img}).")
-
+              
 
         except (ValueError, KeyError) as e:
             print(f"Erro no ponto bruto {ponto_bruto}: {str(e)}")
@@ -208,7 +205,7 @@ def processar_todos_csv(diretorio_csv, pasta_imagens):
 
         for caminho_imagem, dados in dados_por_imagem.items():
             pontos_brutos = dados['pontos_brutos']
-            target_info = dados['target_info'] # Pega as informações do alvo da tela
+            target_info = dados['target_info']
             width_img = dados['width_img']
             height_img = dados['height_img']
 
